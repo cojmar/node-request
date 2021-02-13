@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        new class {
+            constructor() {
+                this.location = 'http://localhost:3000/'
+                this.send_cmd('get_data', {}, (data) => {
+                    this.data = JSON.parse(data)
+                    this.main()
+                })
+
+            }
+            send_cmd(cmd, data, cb) {
+                fetch(this.location, {
+                    method: 'POST', // or 'PUT'
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ cmd: cmd, data: data }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (cb) cb(data)
+                    })
+                    .catch((error) => {
+                        if (cb) cb(error)
+                    });
+            }
+            save_data() {
+                this.send_cmd('set_data', this.data)
+            }
+            main() {
+                console.log(this.data)
+                this.data.version++
+                this.save_data()
+            }
+        }
+    </script>
+</body>
+
+</html>
